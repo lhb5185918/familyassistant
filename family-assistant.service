@@ -4,11 +4,15 @@ After=network.target
 
 [Service]
 Type=exec
-User=familyapp
-Group=familyapp
-WorkingDirectory=/home/familyapp/projects/family-assistant
-ExecStart=/home/familyapp/projects/family-assistant/start_gunicorn.sh
+User=root
+Group=root
+WorkingDirectory=/root/family-assistant
+Environment=DJANGO_SETTINGS_MODULE=production_settings
+ExecStart=/root/family-assistant/start_gunicorn.sh
 ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
 Restart=on-failure
 RestartSec=5
 
