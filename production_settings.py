@@ -83,6 +83,7 @@ DATABASES = {
             'use_unicode': True,
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'autocommit': True,
+            'CONN_MAX_AGE': 60,  # 连接池
         },
     }
 }
