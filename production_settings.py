@@ -1,19 +1,29 @@
-# production_settings.py
-# 生产环境Django设置
-
+"""
+Django生产环境配置文件
+"""
 import os
 from pathlib import Path
+import pymysql
+
+# 配置PyMySQL作为MySQLdb的替代
+pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'your-production-secret-key-here'  # 请更换为安全的密钥
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-6uv_z3=b19ecxzhw6_8zy)9gz&hd3q($x6l@&=%q0gx7n8apy7')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['www.familyassistant.top', 'familyassistant.top', 'your-server-ip']
+ALLOWED_HOSTS = [
+    'www.familyassistant.top',
+    'familyassistant.top',
+    'localhost',
+    '127.0.0.1',
+    # 添加您的服务器IP地址
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -59,9 +69,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'FAMILY_ASSISTANT.wsgi.application'
 
 # Database
-import pymysql
-pymysql.install_as_MySQLdb()
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -70,6 +77,7 @@ DATABASES = {
         'PASSWORD': 'Lhx7758521003!',
         'HOST': 'rm-bp1187tb295ka68e9lo.mysql.rds.aliyuncs.com',
         'PORT': '3306',
+        'CONN_MAX_AGE': 60,  # 连接池
         'OPTIONS': {
             'charset': 'utf8mb4',
             'use_unicode': True,
@@ -150,28 +158,48 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-# CORS设置（如果需要跨域访问）
-CORS_ALLOWED_ORIGINS = [
-    "https://www.familyassistant.top",
-    "https://familyassistant.top",
-]
+# HTTPS设置（如果使用SSL）
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 # 日志配置
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
     'handlers': {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / 'logs' / 'django.log',
+            'formatter': 'verbose',
         },
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['file', 'console'],
+        'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'INFO',
-            'propagate': True,
+            'propagate': False,
         },
     },
 } 
