@@ -1,0 +1,16 @@
+[Unit]
+Description=Family Assistant Django Application
+After=network.target
+
+[Service]
+Type=exec
+User=familyapp
+Group=familyapp
+WorkingDirectory=/home/familyapp/projects/family-assistant
+ExecStart=/home/familyapp/projects/family-assistant/start_gunicorn.sh
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target 
